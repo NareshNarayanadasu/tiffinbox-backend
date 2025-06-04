@@ -1,0 +1,36 @@
+
+services:
+  backend:
+    build:
+      context: ./tiffinbox-backend
+    container_name: tiffinbox-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./tiffinbox-frontend
+    container_name: tiffinbox-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres
+    container_name: tiffinbox-db
+    environment:
+      POSTGRES_DB: tiffinbox
+      POSTGRES_USER: tiffin
+      POSTGRES_PASSWORD: tiffin123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:
