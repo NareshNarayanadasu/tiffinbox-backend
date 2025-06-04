@@ -1,18 +1,11 @@
+
 version: '3'
+
 services:
   web:
     build: .
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     volumes:
       - .:/app
-  db:
-    image: postgres
-    environment:
-      POSTGRES_DB: tiffinbox
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
+    command: python manage.py runserver 0.0.0.0:8000
