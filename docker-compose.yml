@@ -1,36 +1,30 @@
-
+version: '3.9'
 services:
   backend:
-    build:
-      context: ./tiffinbox-backend
-    container_name: tiffinbox-backend
+    build: ./tiffinbox-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./tiffinbox-backend:/app
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
     depends_on:
       - db
 
   frontend:
-    build:
-      context: ./tiffinbox-frontend
-    container_name: tiffinbox-frontend
+    build: ./tiffinbox-frontend
     ports:
-      - "8080:80"
+      - "3000:80"
     depends_on:
       - backend
 
   db:
-    image: postgres
-    container_name: tiffinbox-db
+    image: postgres:13
     environment:
-      POSTGRES_DB: tiffinbox
-      POSTGRES_USER: tiffin
-      POSTGRES_PASSWORD: tiffin123
+      POSTGRES_USER: tiffinbox
+      POSTGRES_PASSWORD: tiffinpass
+      POSTGRES_DB: tiffindb
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
 volumes:
   pgdata:

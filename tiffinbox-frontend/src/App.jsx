@@ -1,7 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "./components/ui/button";
 
 export default function App() {
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!email) {
+      alert("Please enter an email address");
+      return;
+    }
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      alert(data.message);
+    } catch (error) {
+      alert("Failed to subscribe");
+      console.error(error);
+    }
+  };
+
+  const handleChoosePlan = async (plan) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api/choose-plan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await res.json();
+      alert(`You chose the ${plan} plan!`);
+    } catch (error) {
+      alert("Failed to choose plan");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-800">
       <header className="bg-green-600 text-white p-4 shadow-md">
@@ -20,7 +56,21 @@ export default function App() {
       <section className="text-center py-20 bg-gradient-to-br from-green-200 to-green-50">
         <h2 className="text-4xl font-bold mb-4">Fresh. Homemade. Delivered.</h2>
         <p className="text-lg mb-6">Subscribe to healthy daily meals with TiffinBox</p>
-        <Button className="bg-green-600 hover:bg-green-700">Subscribe Now</Button>
+        <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="p-2 rounded border w-72"
+          />
+          <Button
+            className="bg-green-600 hover:bg-green-700"
+            onClick={handleSubscribe}
+          >
+            Subscribe Now
+          </Button>
+        </div>
       </section>
 
       <section id="menu" className="py-16 px-4 bg-white">
@@ -47,21 +97,22 @@ export default function App() {
         <div className="container mx-auto">
           <h3 className="text-3xl font-bold mb-8 text-center">Meal Plans</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 border rounded-xl shadow bg-white">
-              <h4 className="text-xl font-semibold mb-2">Weekly</h4>
-              <p className="mb-4">₹499 for 7 meals</p>
-              <Button className="bg-green-600 hover:bg-green-700 w-full">Choose</Button>
-            </div>
-            <div className="p-6 border rounded-xl shadow bg-white">
-              <h4 className="text-xl font-semibold mb-2">Monthly</h4>
-              <p className="mb-4">₹1999 for 30 meals</p>
-              <Button className="bg-green-600 hover:bg-green-700 w-full">Choose</Button>
-            </div>
-            <div className="p-6 border rounded-xl shadow bg-white">
-              <h4 className="text-xl font-semibold mb-2">Trial</h4>
-              <p className="mb-4">₹99 for 1 meal</p>
-              <Button className="bg-green-600 hover:bg-green-700 w-full">Choose</Button>
-            </div>
+            {["Weekly", "Monthly", "Trial"].map((plan) => (
+              <div key={plan} className="p-6 border rounded-xl shadow bg-white">
+                <h4 className="text-xl font-semibold mb-2">{plan}</h4>
+                <p className="mb-4">
+                  {plan === "Weekly" && "₹499 for 7 meals"}
+                  {plan === "Monthly" && "₹1999 for 30 meals"}
+                  {plan === "Trial" && "₹99 for 1 meal"}
+                </p>
+                <Button
+                  className="bg-green-600 hover:bg-green-700 w-full"
+                  onClick={() => handleChoosePlan(plan)}
+                >
+                  Choose
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
       </section>
